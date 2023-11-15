@@ -7,7 +7,6 @@
 #include "AudioGeneratorWAV.h"
 #include "AudioOutputI2SNoDAC.h"
 #include "whistle.h"
-#include "notcount.h"
 #include "one.h"
 #include "two.h"
 #include "three.h"
@@ -28,11 +27,12 @@
 #include "eighteen.h"
 #include "nineteen.h"
 #include "twenty.h"
+#include "end.h"
 
 // LCD
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
-#define time 15000
+#define time 20000
 
 // Ultrasonic
 SoftwareSerial mySerial(12, 14);
@@ -57,7 +57,7 @@ unsigned long prMillis = millis();
 void setup() {
   Serial.begin(9600);
 
-  // Ultrasonic
+  // Ultrasonic 
   mySerial.begin(9600);
 
   // LCD
@@ -121,20 +121,6 @@ void setup() {
           //notcount
           else if (Dis > 45) {
             checkstart = false;
-            audioLogger = &Serial;
-            file = new AudioFileSourcePROGMEM( notcount, sizeof(notcount) );
-            out = new AudioOutputI2SNoDAC();
-            wav = new AudioGeneratorWAV();
-            wav->begin(file, out);
-            do {
-              if (wav->isRunning()) {
-                if (!wav->loop()) {
-                  wav->stop();
-                  break;
-                } 
-              } 
-            }   
-            while (1);
           }
         }
 
@@ -147,21 +133,6 @@ void setup() {
           else if (Dis > 45) {
             checkstart = false;
             check10 = false;
-            checkstart = false;
-            audioLogger = &Serial;
-            file = new AudioFileSourcePROGMEM( notcount, sizeof(notcount) );
-            out = new AudioOutputI2SNoDAC();
-            wav = new AudioGeneratorWAV();
-            wav->begin(file, out);
-            do {
-              if (wav->isRunning()) {
-                if (!wav->loop()) {
-                  wav->stop();
-                  break;
-                } 
-              } 
-            }   
-            while (1);
           }
         }
       }
@@ -492,7 +463,16 @@ void setup() {
     }   
     while (1);
   }
+
+  audioLogger = &Serial;
+  file = new AudioFileSourcePROGMEM( end, sizeof(end) );
+  out = new AudioOutputI2SNoDAC();
+  wav = new AudioGeneratorWAV();
+  wav->begin(file, out);
 }
 
 void loop() {
+  if (wav->isRunning()) {
+    if (!wav->loop()) wav->stop();
+  }
 }
